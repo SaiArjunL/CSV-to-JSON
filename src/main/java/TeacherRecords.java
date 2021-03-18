@@ -1,7 +1,5 @@
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
@@ -20,15 +18,18 @@ import org.json.simple.JSONObject;
 public class TeacherRecords  extends DataServices {
 
 //      Reads the teacher records from CSV file and stores in an Arraylist
-    public List<Teacher> getTeacherDetails(String filePath) {
+    public List<Teacher> getTeacherDetails() {
 
-        BufferedReader fileReader = null;
         CSVParser csvParser = null;
 
         List<Teacher> studentList = new ArrayList<>();
 
-        try {
-            fileReader = new BufferedReader(new FileReader(filePath));
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("master-data.csv");
+
+        try (InputStreamReader streamReader =
+                     new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+             BufferedReader fileReader = new BufferedReader(streamReader)) {
+
             csvParser = new CSVParser(fileReader, CSVFormat.DEFAULT.withFirstRecordAsHeader().withIgnoreHeaderCase().withTrim());
 
             for (CSVRecord csvRecord : csvParser) {
@@ -63,7 +64,7 @@ public class TeacherRecords  extends DataServices {
             e.printStackTrace();
         } finally {
             try {
-                fileReader.close();
+                assert csvParser != null;
                 csvParser.close();
             } catch (IOException e) {
                 System.out.println("Closing fileReader/csvParser Error!");
@@ -83,7 +84,7 @@ public class TeacherRecords  extends DataServices {
         String fileName = "teacher_record_" + dtf.format(now) + ".json";
 
         JSONObject obj=new JSONObject();
-        obj.put("studentRecordCount", teachers.size());
+        obj.put("teacherRecordCount", teachers.size());
         obj.put("data", teachers);
 
         writer.writeValue(new File( path + "\\" + fileName), obj);

@@ -7,14 +7,12 @@ public class MainApplication {
         StudentRecords studentRecords = new StudentRecords();
         TeacherRecords teacherRecords = new TeacherRecords();
 
-        String resourceFile = "D:\\Csv2JsonTask\\src\\main\\resources\\master-data.csv";
-
         System.out.println("Please enter the path to save json files: ");
         Scanner sc = new Scanner(System.in);
         String path = sc.nextLine();
 
-        List<Student> students =  studentRecords.getStudentDetails(resourceFile);
-        List<Teacher> teachers =  teacherRecords.getTeacherDetails(resourceFile);
+        List<Student> students =  studentRecords.getStudentDetails();
+        List<Teacher> teachers =  teacherRecords.getTeacherDetails();
 
         if(students != null && teachers != null) {
             if (studentRecords.convertJavaObjectToJsonFile(students, path) && teacherRecords.convertJavaObjectToJsonFile(teachers, path)) {

@@ -1,4 +1,5 @@
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
@@ -17,15 +18,18 @@ import org.json.simple.JSONObject;
 public class StudentRecords extends DataServices {
 
 //      Reads the student records from CSV file and stores in an Arraylist
-    public List<Student> getStudentDetails(String fileName) {
+    public List<Student> getStudentDetails() {
 
-        BufferedReader fileReader = null;
         CSVParser csvParser = null;
 
         List<Student> studentList = new ArrayList<>();
 
-        try {
-            fileReader = new BufferedReader(new FileReader(fileName));
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("master-data.csv");
+
+            try (InputStreamReader streamReader =
+                         new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+                 BufferedReader fileReader = new BufferedReader(streamReader)) {
+
             csvParser = new CSVParser(fileReader, CSVFormat.DEFAULT.withFirstRecordAsHeader().withIgnoreHeaderCase().withTrim());
 
             for (CSVRecord csvRecord : csvParser) {
@@ -60,7 +64,7 @@ public class StudentRecords extends DataServices {
             e.printStackTrace();
         } finally {
             try {
-                fileReader.close();
+                assert csvParser != null;
                 csvParser.close();
             } catch (IOException e) {
                 System.out.println("Closing fileReader/csvParser Error!");
